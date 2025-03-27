@@ -29,14 +29,24 @@ class Program
             foreach (var frase in resposta)
             {
                 Match match = rg.Match(frase);
-                
+
                 var nomJugador = match.Groups[1].Value;
                 var pais = match.Groups[4].Value;
                 participants.Add(nomJugador, pais);
                 Console.WriteLine(nomJugador);
             }
+
+            foreach (var frase in resposta)
+            {
+                Match match = rga.Match(frase);
+
+                var desqualificat = match.Groups[1].Value;
+
+                participants.Remove(desqualificat);
+            }
             
-            
+            //fer un for que faci 10000 peticions (get) a servidor per les partides
+            //un switch que comprovi el resultat a cada partida
             
         }
         catch (Exception e)
