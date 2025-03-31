@@ -5,9 +5,9 @@ namespace TicTacToe;
 
 class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
-        var url = "http://localhost:8080";
+        var url = "http://localhost:8080/";
 
         Uri uri = new Uri(url);
 
@@ -47,56 +47,106 @@ class Program
                 resultats.Remove(desqualificat);
             }
             
-            for (int i = 0; i < 10000; i++)
+            for (int i = 1; i < 10001; i++)
             {
-                var partida = client.GetFromJsonAsync<Partida>($"/partida/{i}").Result;
+                var partida = await client.GetFromJsonAsync<Partida>($"partida/{i}");
+                //ensure
 
                 if (resultats.ContainsKey(partida.jugador1)&&resultats.ContainsKey(partida.jugador2))
                 {
                     //comprovar files
-                    var guanyador = 'a'; 
+                    var guanyador = 'a';
+                    //p serveix per comprovar que en una partid només hi ha un guanyador
+                    var p = 0;
+                    
                     for (int j = 0; j < partida.tauler.Length; j++)
                     {
                         var fila = partida.tauler[j];
                         if (fila[0]==fila[1]&&fila[1]==fila[2])
                         {
                             guanyador = fila[0];
+                            p++;
                         }
-                    }
-
-                    if (guanyador == 'X')
-                    {
-                        resultats[partida.jugador2]++;
-                    }
-                    else if (guanyador == 'O')
-                    {
-                        resultats[partida.jugador1]++;
-                    }
-                    
-                    /*for (int j = 0; j < partida.tauler.Length; j++)
-                    {
-                        var columna = partida.tauler[];
                         
-                        if (columna[0]==columna[1]&&columna[1]==columna[2])
-                        {
-                            guanyador = columna[0];
-                        }
-                    }*/
+                    }
 
                     //comprovar columnes manualment
-                    for (int j = 0; j < partida.tauler.Length; j++)
+                    if (guanyador == 'a')
                     {
-                        if (partida.tauler[0][j]==partida.tauler[1][j]&&partida.tauler[1][j]==partida.tauler[2][j])
+                        for (int j = 0; j < partida.tauler.Length; j++)
                         {
-                            guanyador = columna[0]; //arreglar
+                            if (partida.tauler[0][j]==partida.tauler[1][j]&&partida.tauler[1][j]==partida.tauler[2][j])
+                            {
+                                guanyador = partida.tauler[0][j];
+                                p++;
+                            }
+                        }
+                    }
+
+                    //diagonal esquerra
+                    if (guanyador == 'a')
+                    {
+                        if (partida.tauler[0][0]==partida.tauler[1][1]&&partida.tauler[2][2]==partida.tauler[1][1])
+                        {
+                            guanyador = partida.tauler[0][0];
+                            p++;
+                        }
+                    }
+                    
+                    //diagonal dreta
+                    if (guanyador == 'a')
+                    {
+                        if (partida.tauler[0][2]==partida.tauler[1][1]&&partida.tauler[2][0]==partida.tauler[1][1])
+                        {
+                            guanyador = partida.tauler[0][2];
+                            p++;
+                        }
+                    }
+
+                    if (p == 1)
+                    {
+                        if (guanyador == 'X')
+                        {
+                            resultats[partida.jugador2]++;
+                        }
+                        else if (guanyador == 'O')
+                        {
+                            resultats[partida.jugador1]++;
                         }
                     }
                 }
             }
-            //fer un for que faci 10000 peticions (get) a servidor per les partides
-            //un switch que comprovi el resultat a cada partida
-            //diccionari punts que té clau x i clau 0 valor es va sumant punts[X]++ if (un[0]== un[1]...) var s = 
+            //qin és el guanyador
+            var mesGran = 0;
+            var winner = "";
+            bool esEmpat = false;
             
+            foreach (var jugador in resultats)
+            {
+                if (jugador.Value > mesGran)
+                {
+                    mesGran = jugador.Value;
+                    winner = jugador.Key;
+                }
+
+                if (jugador.Value == mesGran)
+                {
+                    Console.WriteLine("Hi ha hagut un empat! No hi han guanyadors");
+                    esEmpat = true;
+                    break;
+                }
+            }
+
+            if (!esEmpat)
+            {
+                foreach (var jugadors in participants)
+                {
+                    if (winner == jugadors.Key)
+                    {
+                        Console.WriteLine($"El guanyador és {jugadors.Key} del país {jugadors.Value}!!!");
+                    }
+                }
+            }
         }
         catch (Exception e)
         {
