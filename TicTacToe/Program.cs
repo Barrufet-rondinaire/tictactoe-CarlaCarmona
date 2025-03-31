@@ -123,29 +123,31 @@ class Program
             
             foreach (var jugador in resultats)
             {
+                if (jugador.Value == mesGran)
+                {
+                    esEmpat = true;
+                    break;
+                }
+                
                 if (jugador.Value > mesGran)
                 {
                     mesGran = jugador.Value;
                     winner = jugador.Key;
-                }
-
-                if (jugador.Value == mesGran)
-                {
-                    Console.WriteLine("Hi ha hagut un empat! No hi han guanyadors");
-                    esEmpat = true;
-                    break;
+                    esEmpat = false;
                 }
             }
 
-            if (!esEmpat)
+            foreach (var jugadors in participants)
             {
-                foreach (var jugadors in participants)
+                if (winner == jugadors.Key && esEmpat!=true)
                 {
-                    if (winner == jugadors.Key)
-                    {
-                        Console.WriteLine($"El guanyador és {jugadors.Key} del país {jugadors.Value}!!!");
-                    }
+                    Console.WriteLine($"El guanyador és {jugadors.Key} del país {jugadors.Value}!!!");
                 }
+            }
+            
+            if (esEmpat)
+            {
+                Console.WriteLine("Hi ha hagut un empat! No hi han guanyadors");
             }
         }
         catch (Exception e)
